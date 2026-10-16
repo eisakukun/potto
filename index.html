@@ -169,7 +169,7 @@ body.quick .recent{display:block}
 
 <script src="parse.js"></script>
 <script>
-const APP_VERSION = '2026-10-16-1';
+const APP_VERSION = '2026-10-16-2';
 const GAS = 'https://script.google.com/macros/s/AKfycbyX-ywN70IMoxiLOF3VyRgje4y85_ilLzhyWfqszCvaEevBNjxtX62tboVMyGvht9VGbw/exec';
 const Q = new URLSearchParams(location.search);
 const QUICK = Q.get('quick') === '1';
@@ -186,6 +186,9 @@ const LS = {
 };
 // 合言葉は #k=… で1回だけ渡す（コードには書かない）
 (function () {
+  // iPhone：Safariとホーム画面のアプリは保存場所が別。?k= を付けたままホーム画面に追加すれば、アプリ側も最初から合言葉を持つ
+  const q = Q.get('k');
+  if (q && /^[A-Za-z0-9]+$/.test(q)) LS.set('key', q);
   const m = /[#&]k=([A-Za-z0-9]+)/.exec(location.hash);
   if (m) { LS.set('key', m[1]); history.replaceState(null, '', location.pathname + location.search); }
 })();
