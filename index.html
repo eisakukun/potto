@@ -134,6 +134,14 @@ body[data-tab="home"] #tagView,body.quick #tagView{display:none}
 .gs .gl{font-size:12px;color:var(--dim);margin-top:3px;line-height:1.6}
 .gs .nx{color:var(--accent)}
 .tgtab{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+/* 日記でこのタグを付けた文章（Macの日記が置いていく。ここでは見るだけ） */
+.tgnk{margin-top:16px}
+.tgnk h4{margin:0 0 8px;font-size:13px;font-weight:600;color:var(--dim)}
+.tgnk .nr{display:grid;grid-template-columns:118px 1fr;gap:8px;padding:8px 10px;border-top:1px solid var(--line);font-size:13.5px;line-height:1.7}
+.tgnk .nr:first-of-type{border-top:0}
+.tgnk .nr .d{color:var(--dim)}
+.tgnk .box{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--c);border-radius:12px;overflow:hidden}
+@media (max-width:640px){ .tgnk .nr{grid-template-columns:1fr;gap:2px} }
 .tr{display:grid;grid-template-columns:118px 26px 1fr 110px minmax(0,190px) 28px;gap:8px;align-items:center;padding:8px 10px;border-top:1px solid var(--line);font-size:13.5px;cursor:pointer}
 .tr:first-child{border-top:0}
 .tr:hover{background:var(--panel2)}
@@ -323,7 +331,7 @@ body.quick .recent{display:block}
 
 <script src="parse.js?v=2026-10-19-3"></script>
 <script>
-const APP_VERSION = '2026-10-19-3';
+const APP_VERSION = '2026-10-20-1';
 const GAS = 'https://script.google.com/macros/s/AKfycbyX-ywN70IMoxiLOF3VyRgje4y85_ilLzhyWfqszCvaEevBNjxtX62tboVMyGvht9VGbw/exec';
 const Q = new URLSearchParams(location.search);
 const QUICK = Q.get('quick') === '1';
@@ -412,6 +420,10 @@ const tagDefs = () => (items._tags && !items._tags.del && Array.isArray(items._t
 const tagById = id => tagDefs().find(t => t.id === id);
 function saveTags(list) { const cur = items._tags || { id: '_tags', kind: 'tags', c: Date.now() }; touch(Object.assign({}, cur, { list, del: false })); }
 const realItems = () => Object.values(items).filter(x => !x.del && (x.kind === 'log' || x.kind === 'due'));
+// 日記（Mac）でこのタグを付けた文章。日ごとに1件（kind 'nikki'）で届く
+const nikkiRows = id => Object.values(items).filter(x => x.kind === 'nikki' && !x.del && x.date)
+  .flatMap(x => (x.list || []).filter(r => r.pid === id).map(r => ({ date: x.date, text: r.text })))
+  .sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
 const wordsOf = t => String(t.words || '').split(/[、,，\s]+/).map(w => w.trim()).filter(Boolean);
 function autoTags(x) {
   const text = (x.title || '') + ' ' + (x.raw || '');
@@ -714,17 +726,19 @@ function drawTags(all, now) {
   const defs = tagDefs();
   const by = {}; all.forEach(x => tagIds(x).forEach(id => (by[id] = by[id] || []).push(x)));
   if (!tagById(selTag)) selTag = defs[0] ? defs[0].id : '';
-  $('tgBar').innerHTML = defs.map(t => `<button data-tag="${t.id}" class="${t.id === selTag ? 'on' : ''}" style="--c:${t.color}">${t.emoji || '🏷'} ${esc(t.name)} <span class="c">${(by[t.id] || []).length}</span></button>`).join('')
+  $('tgBar').innerHTML = defs.map(t => `<button data-tag="${t.id}" class="${t.id === selTag ? 'on' : ''}" style="--c:${t.color}">${t.emoji || '🏷'} ${esc(t.name)} <span class="c">${(by[t.id] || []).length + nikkiRows(t.id).length}</span></button>`).join('')
     + '<button class="add" id="tgAdd">＋ タグを作る</button>';
   document.querySelectorAll('#tgBar [data-tag]').forEach(b => b.onclick = () => { selTag = b.dataset.tag; LS.set('selTag', selTag); render(); });
   $('tgAdd').onclick = () => openTagSheet(null);
   const t = tagById(selTag);
   if (!t) { $('tgBody').innerHTML = '<div class="empty">タグがありません。「＋ タグを作る」から作れます</div>'; return; }
   const list = (by[t.id] || []).slice().sort((a, b) => (b.at || b.c) - (a.at || a.c));
-  const ws = wordsOf(t);
-  let h = `<div class="tghead"><h3>${t.emoji || '🏷'} ${esc(t.name)}</h3><span class="hint">${list.length}件</span><span class="sp" style="flex:1"></span><button class="ed" id="tgEdit">✎ このタグを直す</button></div>`;
+  const ws = wordsOf(t), nk = nikkiRows(t.id);
+  const nkHtml = !nk.length ? '' : `<div class="tgnk"><h4>📓 日記から <span class="hint">${nk.length}か所</span></h4><div class="box" style="--c:${t.color}">`
+    + nk.map(r => `<div class="nr"><span class="d">${fmtDate(new Date(r.date + 'T00:00:00').getTime())}</span><span>${esc(r.text)}</span></div>`).join('') + '</div></div>';
+  let h = `<div class="tghead"><h3>${t.emoji || '🏷'} ${esc(t.name)}</h3><span class="hint">${list.length}件${nk.length ? '＋日記' + nk.length : ''}</span><span class="sp" style="flex:1"></span><button class="ed" id="tgEdit">✎ このタグを直す</button></div>`;
   h += `<div class="tgwords">${ws.length ? '自動で付く言葉：' + ws.map(esc).join('、') : '自動では付かない'}　／　書くときに <b>#${esc(t.name)}</b> と入れても付く</div>`;
-  if (!list.length) { $('tgBody').innerHTML = h + `<div class="empty">まだ何も付いていない</div>`; $('tgEdit').onclick = () => openTagSheet(t.id); return; }
+  if (!list.length) { $('tgBody').innerHTML = h + (nk.length ? nkHtml : `<div class="empty">まだ何も付いていない</div>`); $('tgEdit').onclick = () => openTagSheet(t.id); return; }
 
   // まとめ（なにごと／人ごと）：回数・最後・平均の間隔・次はだいたい
   const gk = x => t.by === 'who' ? (x.who || PottoParse.parse(x.raw || x.title).who || PottoParse.groupKey(x.title)) : PottoParse.groupKey(x.title);   // 前に書いた分は「だれ」が空なので読み直す
@@ -753,7 +767,7 @@ function drawTags(all, now) {
     const d = x.at != null ? fmtDate(x.at, x.hasTime) : '期限未定';
     const sub = x.kind === 'due' ? (x.done ? '✓ 済み' : x.at != null ? leftTxt(x, now) : '') : agoTxt(x.at, now);
     return `<div class="tr${x.done ? ' done' : ''}" data-id="${x.id}"><span class="d">${d}</span><span>${x.kind === 'due' ? '⏳' : '📝'}</span><span class="tt2">${esc(x.title)}<small>${sub}</small></span><span class="w">${x.who ? '👤' + esc(x.who) : ''}</span><span class="ot">${others}</span><button class="xx" title="消す">×</button></div>`;
-  }).join('') + '</div>';
+  }).join('') + '</div>' + nkHtml;
   $('tgBody').innerHTML = h;
   $('tgEdit').onclick = () => openTagSheet(t.id);
 }
