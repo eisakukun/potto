@@ -89,12 +89,21 @@ button.chip{border:1px dashed transparent} button.chip:hover{border-color:var(--
   .wd .wi{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:3px}
   .wd .ci{margin:0;max-width:100%}
   .wd .ci small{display:inline;margin-right:3px}
+  .wd .ci{padding-right:22px}
   .wd .wi:empty::after{content:'—';color:var(--faint);font-size:11px}
   .mc{min-height:42px}
   .mi{display:none}
   .mdots{display:flex;gap:2px;flex-wrap:wrap;margin-top:2px;padding-left:2px}
   .mdots i{width:5px;height:5px;border-radius:50%;display:block}
 }
+
+.xx{flex:none;width:24px;height:24px;border-radius:50%;color:var(--faint);font-size:15px;line-height:24px;text-align:center;align-self:center}
+.xx:hover{background:rgba(255,107,94,.18);color:var(--due2)}
+.card .xx{align-self:flex-start;margin:-2px -4px 0 0}
+.wd .ci{position:relative}
+.wd .ci .xx{position:absolute;top:1px;right:1px;width:18px;height:18px;line-height:18px;font-size:12px;background:var(--panel);display:none}
+.wd .ci:hover .xx{display:block}
+@media (hover:none){ .wd .ci .xx{display:block} }
 
 /* 帯（今日を真ん中にした線） */
 .strip{margin:14px 0 6px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:6px 4px;overflow:hidden}
@@ -235,7 +244,7 @@ body.quick .recent{display:block}
 
 <script src="parse.js"></script>
 <script>
-const APP_VERSION = '2026-10-19-1';
+const APP_VERSION = '2026-10-19-2';
 const GAS = 'https://script.google.com/macros/s/AKfycbyX-ywN70IMoxiLOF3VyRgje4y85_ilLzhyWfqszCvaEevBNjxtX62tboVMyGvht9VGbw/exec';
 const Q = new URLSearchParams(location.search);
 const QUICK = Q.get('quick') === '1';
@@ -419,6 +428,7 @@ function render() {
   drawCal(all, now);
   document.querySelectorAll('[data-id]').forEach(el => el.onclick = e => {
     if (e.target.closest('.ck')) { e.stopPropagation(); markDone(el.dataset.id); return; }
+    if (e.target.closest('.xx')) { e.stopPropagation(); delItem(el.dataset.id); return; }
     openSheet(el.dataset.id);
   });
 }
@@ -470,7 +480,7 @@ function drawCal(all, now) {
   let w = '';
   for (let i = 0; i < 7; i++) {
     const day = addDay(wk0, i), d = new Date(day), es = by[day] || [];
-    const chips = es.map(x => `<div class="${ciCls(x, now)}" data-id="${x.id}" title="${esc(x.title)}">${x.hasTime ? '<small>' + new Date(x.at).getHours() + ':' + p2(new Date(x.at).getMinutes()) + '</small>' : ''}${x.icon || (x.kind === 'due' ? '⏳' : '')}${esc(x.title)}</div>`).join('');
+    const chips = es.map(x => `<div class="${ciCls(x, now)}" data-id="${x.id}" title="${esc(x.title)}">${x.hasTime ? '<small>' + new Date(x.at).getHours() + ':' + p2(new Date(x.at).getMinutes()) + '</small>' : ''}${x.icon || (x.kind === 'due' ? '⏳' : '')}${esc(x.title)}<button class="xx" title="消す">×</button></div>`).join('');
     w += `<div class="wd${day === selDay ? ' sel' : ''}${day === today ? ' today' : ''}" data-day="${day}"><div class="wh"><span class="${wcls(d.getDay())}">${W[d.getDay()]}</span> <b>${d.getDate()}</b></div><div class="wi">${chips}</div></div>`;
   }
   $('wGrid').innerHTML = w;
@@ -481,7 +491,7 @@ function drawCal(all, now) {
   $('dList').innerHTML = es.length ? es.map(x => {
     const t = x.hasTime ? new Date(x.at).getHours() + ':' + p2(new Date(x.at).getMinutes()) : (x.kind === 'due' ? 'この日' : '');
     const r = x.kind === 'due' ? (x.done ? '✓ 済み' : leftTxt(x, now)) : (x.kind === 'log' ? '📝 記録' : '');
-    return `<div class="${ciCls(x, now)}" data-id="${x.id}"><span class="t">${t}</span><span>${x.icon ? x.icon + ' ' : ''}${esc(x.title)}${x.who ? ` <span class="w">👤${esc(x.who)}</span>` : ''}</span><span class="r">${r}</span></div>`;
+    return `<div class="${ciCls(x, now)}" data-id="${x.id}"><span class="t">${t}</span><span>${x.icon ? x.icon + ' ' : ''}${esc(x.title)}${x.who ? ` <span class="w">👤${esc(x.who)}</span>` : ''}</span><span class="r">${r}</span><button class="xx" title="消す">×</button></div>`;
   }).join('') : '<div class="none">この日は何もない</div>';
   document.querySelectorAll('#cal [data-day]').forEach(el => el.onclick = e => { if (e.target.closest('[data-id]')) return; setSel(Number(el.dataset.day)); });
 }
@@ -499,7 +509,7 @@ function dueCard(x, now) {
   if (x.who) meta.push(`<span class="who">👤 ${esc(x.who)}</span>`);
   if (x.rid && x.rid !== '-') meta.push('<span title="Macのリマインダー「期限」に入っている">🔔 リマインダー</span>');
   { const g = agoTxt(x.c, now); meta.push(`<span>${g}${/今日|昨日/.test(g) ? '' : 'に'}書いた</span>`); }
-  return `<div class="${cls}" data-id="${x.id}"><button class="ck" title="済み">✓</button><div class="bd"><div class="tt">${x.icon ? x.icon + ' ' : ''}${esc(x.title)}</div><div class="mt">${meta.join('')}</div>${bar}</div><div class="rt"><div class="big">${big}</div><div class="sm">${sm}</div></div></div>`;
+  return `<div class="${cls}" data-id="${x.id}"><button class="ck" title="済み">✓</button><div class="bd"><div class="tt">${x.icon ? x.icon + ' ' : ''}${esc(x.title)}</div><div class="mt">${meta.join('')}</div>${bar}</div><div class="rt"><div class="big">${big}</div><div class="sm">${sm}</div></div><button class="xx" title="消す">×</button></div>`;
 }
 function logCard(x, now, groups) {
   const meta = [`<span>${fmtDate(x.at, x.hasTime)}</span>`];
@@ -519,7 +529,7 @@ function logCard(x, now, groups) {
     }
     if (x.who) meta.push(`<span class="who">👤 ${esc(x.who)}</span>`);
   }
-  return `<div class="card log ${x._done ? 'done' : ''}" data-id="${x.id}"><div class="ic">${x._done ? '✓' : (x.icon || '・')}</div><div class="bd"><div class="tt">${esc(x.title)}</div><div class="mt">${meta.join('')}</div></div><div class="rt"><div class="big">${agoTxt(x.at, now)}</div></div></div>`;
+  return `<div class="card log ${x._done ? 'done' : ''}" data-id="${x.id}"><div class="ic">${x._done ? '✓' : (x.icon || '・')}</div><div class="bd"><div class="tt">${esc(x.title)}</div><div class="mt">${meta.join('')}</div></div><div class="rt"><div class="big">${agoTxt(x.at, now)}</div></div><button class="xx" title="消す">×</button></div>`;
 }
 
 /* 帯：今日を真ん中に、左＝過去の記録、右＝未来の期限。近いほど広く（平方根の目盛り） */
@@ -604,6 +614,11 @@ $('eSave').onclick = () => closeSheet(true);
 $('sheetBg').onclick = () => closeSheet(true);
 $('eDone').onclick = () => { const x = readSheet(); x.done = !x.done; x.doneAt = x.done ? Date.now() : null; editId = null; touch(x); closeSheet(false); };
 $('eDel').onclick = () => { const x = Object.assign({}, items[editId]); closeSheet(false); x.del = true; touch(x); toast('消した：' + x.title, () => { x.del = false; touch(x); }); };
+function delItem(id) {   // 確認なしですぐ消す。5秒だけ元に戻せる
+  const x = Object.assign({}, items[id]); if (!x.id) return;
+  x.del = true; touch(x);
+  toast('消した：' + x.title, () => { const y = Object.assign({}, items[id]); y.del = false; touch(y); });
+}
 function markDone(id) {
   const x = Object.assign({}, items[id]); x.done = true; x.doneAt = Date.now(); touch(x);
   toast('✓ 済み：' + x.title, () => { const y = Object.assign({}, items[id]); y.done = false; y.doneAt = null; touch(y); });
