@@ -102,8 +102,10 @@
 
   function findWho(t) {
     let m = /([^\s、。,()（）「」]{1,12}?)(さん|くん|君|ちゃん|先生|様|さま|社長|店長|オーナー|部長)(?=$|[にからがよりとのへ、。\s])/.exec(t);
-    if (m) return m[1] + m[2];
+    if (m) return m[1].split(/[をにがはでへとのも]/).pop() + m[2];   // 「資料を田中さん」→「田中さん」
     m = /([^\s、。,]{1,10}?)(?:に|から)(?:言われ|頼まれ|お願いされ|指示され|聞かれ)/.exec(t);
+    if (m) return m[1];
+    m = /([^\s、。,()（）「」]{1,10}?)(?:さん|くん|君|ちゃん)?(?:と|に)(?:会|あっ|ご飯|ごはん|飲|遊|お茶|ランチ|電話)/.exec(t);   // 会った人
     return m ? m[1] : '';
   }
 
@@ -123,7 +125,8 @@
 
   function parse(raw, nowArg) {
     const now = nowArg ? new Date(nowArg) : new Date();
-    const t = z2h(String(raw || '')).trim();
+    const tagNames = [];   // 「#薬」「＃会った」はタグ。文からは抜く
+    const t = z2h(String(raw || '')).replace(/[#＃]([^\s#＃、。,]+)/g, (m, n) => { tagNames.push(n); return ' '; }).replace(/\s{2,}/g, ' ').trim();
     const dh = findDate(t, now), tm = findTime(t);
     const hasDue = DUE_WORDS.test(t), past = PAST_END.test(t), fut = FUTURE_END.test(t);
     let dir = hasDue || (!past && fut) ? 1 : past ? -1 : 0;
@@ -184,6 +187,7 @@
       at: at ? at.getTime() : null,           // 記録＝やった時／期限＝締め（無ければ null＝期限未定）
       hasTime: !!tm,
       who,
+      tagNames,
       icon: iconFor(t),
     };
   }

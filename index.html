@@ -105,6 +105,62 @@ button.chip{border:1px dashed transparent} button.chip:hover{border-color:var(--
 .wd .ci:hover .xx{display:block}
 @media (hover:none){ .wd .ci .xx{display:block} }
 
+/* タブ */
+.tabs{display:flex;gap:4px;margin-left:8px}
+.tabs button{font-size:12.5px;padding:3px 10px;border-radius:999px;color:var(--dim);background:transparent;border:1px solid var(--line)}
+.tabs button.on{background:var(--panel2);color:var(--ink);border-color:var(--faint)}
+body.quick .tabs{display:none}
+body[data-tab="tags"] .cal,body[data-tab="tags"] .strip,body[data-tab="tags"] .board{display:none}
+body[data-tab="home"] #tagView,body.quick #tagView{display:none}
+
+/* タグの印 */
+.tchip{display:inline-flex;align-items:center;gap:2px;font-size:11px;padding:1px 7px;border-radius:999px;background:color-mix(in srgb,var(--c) 18%,transparent);color:var(--c);white-space:nowrap;line-height:1.5}
+.tchips{display:inline-flex;flex-wrap:wrap;gap:3px;vertical-align:middle}
+
+/* タグのタブ */
+#tagView{margin-top:14px}
+.tgbar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.tgbar button{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:999px;font-size:13.5px;border:1px solid var(--line);background:var(--panel);color:var(--ink)}
+.tgbar button .c{font-size:11px;color:var(--dim)}
+.tgbar button.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 20%,var(--panel));}
+.tgbar button.add{color:var(--dim);border-style:dashed}
+.tghead{display:flex;align-items:center;gap:10px;margin:4px 0 4px}
+.tghead h3{margin:0;font-size:20px}
+.tghead .ed{font-size:12px;padding:5px 10px;border-radius:8px;background:var(--panel2)}
+.tgwords{font-size:12px;color:var(--faint);margin-bottom:12px}
+.tgsum{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px;margin-bottom:14px}
+.gs{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--c);border-radius:10px;padding:9px 11px}
+.gs b{font-size:15px}
+.gs .gl{font-size:12px;color:var(--dim);margin-top:3px;line-height:1.6}
+.gs .nx{color:var(--accent)}
+.tgtab{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.tr{display:grid;grid-template-columns:118px 26px 1fr 110px minmax(0,190px) 28px;gap:8px;align-items:center;padding:8px 10px;border-top:1px solid var(--line);font-size:13.5px;cursor:pointer}
+.tr:first-child{border-top:0}
+.tr:hover{background:var(--panel2)}
+.tr.th{cursor:default;font-size:11px;color:var(--dim);letter-spacing:.06em;background:var(--panel2)}
+.tr .d{font-variant-numeric:tabular-nums;color:var(--dim);font-size:12.5px}
+.tr .w{color:var(--accent);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tr .tt2{min-width:0;word-break:break-word}
+.tr .tt2 small{display:block;color:var(--faint);font-size:11px}
+.tr.done .tt2{text-decoration:line-through;opacity:.6}
+@media (max-width:760px){
+  .tr{grid-template-columns:76px 22px 1fr 26px}
+  .tr .w,.tr .ot{display:none}
+  .tr.th .w,.tr.th .ot{display:none}
+}
+
+/* 直す画面のタグ */
+.etags{display:flex;flex-wrap:wrap;gap:6px}
+.etags button{padding:5px 10px;border-radius:999px;font-size:13px;border:1px solid var(--line);color:var(--dim);background:var(--bg)}
+.etags button.on{color:var(--c);border-color:var(--c);background:color-mix(in srgb,var(--c) 18%,var(--bg))}
+.etags button.add{border-style:dashed}
+
+/* タグを作る・直す */
+.tsheet{z-index:31} .tsheet-bg{z-index:30}
+.pal{display:flex;gap:8px;flex-wrap:wrap}
+.pal button{width:28px;height:28px;border-radius:50%;border:2px solid transparent}
+.pal button.on{border-color:var(--ink)}
+
 /* 帯（今日を真ん中にした線） */
 .strip{margin:14px 0 6px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:6px 4px;overflow:hidden}
 .strip svg{display:block;width:100%;height:auto}
@@ -191,7 +247,7 @@ body.quick .recent{display:block}
 <body>
 <div class="wrap">
   <div class="top">
-    <div class="head"><b>ぽっと</b><span>期限と記録</span><span class="sp"></span><button class="qonly chip" id="openAll">一覧を開く ↗</button><span id="syncTxt"></span><span class="dot" id="syncDot"></span></div>
+    <div class="head"><b>ぽっと</b><nav class="tabs"><button data-tab="home">ホーム</button><button data-tab="tags">🏷 タグ</button></nav><span class="sp"></span><button class="qonly chip" id="openAll">一覧を開く ↗</button><span id="syncTxt"></span><span class="dot" id="syncDot"></span></div>
     <textarea id="inp" rows="1" placeholder="書いて Enter（例：日曜までに片付け）" autocomplete="off" autocapitalize="off" enterkeyhint="done"></textarea>
     <div class="pv" id="pv"><span class="hint">「〜までに」「来週金曜」→ 期限／「〜した」「〜入った」→ 記録</span></div>
     <div id="keyNote"></div>
@@ -202,6 +258,11 @@ body.quick .recent{display:block}
     <div class="cp cm"><div class="ch"><span class="tg">月</span><button class="nv" data-nav="m-1">‹</button><span class="lbl" id="mLbl"></span><button class="nv" data-nav="m1">›</button></div><div class="mg" id="mGrid"></div></div>
     <div class="cp cw"><div class="ch"><span class="tg">週</span><button class="nv" data-nav="w-1">‹</button><span class="lbl" id="wLbl"></span><button class="nv" data-nav="w1">›</button></div><div class="wg" id="wGrid"></div></div>
     <div class="cp cd"><div class="ch"><span class="tg">日</span><button class="nv" data-nav="d-1">‹</button><span class="lbl" id="dLbl"></span><button class="nv" data-nav="d1">›</button><button class="td" data-nav="today">今日</button></div><div class="dl" id="dList"></div></div>
+  </div>
+
+  <div id="tagView">
+    <div class="tgbar" id="tgBar"></div>
+    <div id="tgBody"></div>
   </div>
 
   <div class="strip" id="strip"></div>
@@ -231,8 +292,10 @@ body.quick .recent{display:block}
     <div style="flex:1"><label id="eDateLbl">いつ</label><input id="eDate" type="date"></div>
     <div style="width:42%"><label>時刻（なくてもいい）</label><input id="eTime" type="time"></div>
   </div>
-  <label>だれから（期限をくれた人）</label>
-  <input id="eWho" placeholder="例：オーナー／田中さん">
+  <label>タグ（いくつでも。押すと付く／外れる）</label>
+  <div class="etags" id="eTags"></div>
+  <label>だれ（期限をくれた人／会った人）</label>
+  <input id="eWho" placeholder="例：オーナー／田中さん／タック">
   <div class="btns">
     <button class="btn pri" id="eSave">とじる</button>
     <button class="btn" id="eDone"></button>
@@ -240,11 +303,27 @@ body.quick .recent{display:block}
     <button class="btn warn" id="eDel">消す</button>
   </div>
 </div>
+<div class="sheet-bg tsheet-bg" id="tSheetBg"></div>
+<div class="sheet tsheet" id="tSheet">
+  <div class="row"><div style="width:84px"><label>絵文字</label><input id="tEmoji" maxlength="4"></div><div style="flex:1"><label>タグの名前</label><input id="tName" placeholder="例：薬／会った／買ったもの"></div></div>
+  <label>色</label>
+  <div class="pal" id="tPal"></div>
+  <label>この言葉が入っていたら自動で付く（、で区切る・空でもいい）</label>
+  <textarea id="tWords" rows="2" placeholder="例：薬、サプリ、目薬"></textarea>
+  <label>表のまとめ方</label>
+  <div class="seg" id="tBy"><button data-by="what">なにごと（睡眠薬・ロキソニン…）</button><button data-by="who">人ごと（タック・田中さん…）</button></div>
+  <div class="btns">
+    <button class="btn pri" id="tSave">保存</button>
+    <button class="btn" id="tClose">とじる</button>
+    <span style="flex:1"></span>
+    <button class="btn warn" id="tDel">このタグを消す</button>
+  </div>
+</div>
 <div class="toast" id="toast"><span id="toastTxt"></span><button id="toastBtn">元に戻す</button></div>
 
-<script src="parse.js"></script>
+<script src="parse.js?v=2026-10-19-3"></script>
 <script>
-const APP_VERSION = '2026-10-19-2';
+const APP_VERSION = '2026-10-19-3';
 const GAS = 'https://script.google.com/macros/s/AKfycbyX-ywN70IMoxiLOF3VyRgje4y85_ilLzhyWfqszCvaEevBNjxtX62tboVMyGvht9VGbw/exec';
 const Q = new URLSearchParams(location.search);
 const QUICK = Q.get('quick') === '1';
@@ -317,6 +396,45 @@ async function pull() {
   } catch (e) { setSync('ng', 'オフライン'); }
 }
 
+/* ---------- タグ（いくつでも付く。定義は '_tags' として同期） ---------- */
+const PAL = ['#6fdc9a', '#c49bff', '#ffd166', '#ff7a9c', '#5ee0d0', '#ffb347', '#6cc6ff', '#a0a8b8'];
+const DEFAULT_TAGS = [
+  { id: 'kusuri', name: '薬', emoji: '💊', color: '#6fdc9a', words: '薬、サプリ、処方、目薬、ロキソニン、バファリン', by: 'what' },
+  { id: 'atta', name: '会った', emoji: '👥', color: '#c49bff', words: 'と会、に会、とご飯、とごはん、と飲み、と遊、とお茶、とランチ', by: 'who' },
+  { id: 'katta', name: '買ったもの', emoji: '🛒', color: '#ffd166', words: '買、購入、注文、ポチ', by: 'what' },
+  { id: 'sub', name: 'サブスク', emoji: '💳', color: '#ff7a9c', words: 'サブスク、入会、契約、解約、Netflix、ネトフリ、Spotify、アマプラ', by: 'what' },
+  { id: 'byouin', name: '体・病院', emoji: '🏥', color: '#5ee0d0', words: '病院、歯医者、通院、検診、健診、クリニック', by: 'what' },
+  { id: 'ie', name: '家', emoji: '🏠', color: '#ffb347', words: '片付け、片づけ、掃除、洗濯、整理', by: 'what' },
+  { id: 'tetsuzuki', name: '手続き', emoji: '📄', color: '#6cc6ff', words: '書類、提出、申請、役所、手続', by: 'what' },
+  { id: 'midashi', name: '身だしなみ', emoji: '✂️', color: '#a0a8b8', words: '髪、美容院、散髪、床屋、ネイル', by: 'what' },
+];
+const tagDefs = () => (items._tags && !items._tags.del && Array.isArray(items._tags.list)) ? items._tags.list : DEFAULT_TAGS;
+const tagById = id => tagDefs().find(t => t.id === id);
+function saveTags(list) { const cur = items._tags || { id: '_tags', kind: 'tags', c: Date.now() }; touch(Object.assign({}, cur, { list, del: false })); }
+const realItems = () => Object.values(items).filter(x => !x.del && (x.kind === 'log' || x.kind === 'due'));
+const wordsOf = t => String(t.words || '').split(/[、,，\s]+/).map(w => w.trim()).filter(Boolean);
+function autoTags(x) {
+  const text = (x.title || '') + ' ' + (x.raw || '');
+  return tagDefs().filter(t => wordsOf(t).some(w => text.includes(w))).map(t => t.id);
+}
+function tagIds(x) {   // 付いているタグ＝自分で付けた分＋自動の分−外した分
+  const no = x.notags || [], ids = [...(x.tags || []), ...autoTags(x)];
+  return [...new Set(ids)].filter(id => !no.includes(id) && tagById(id));
+}
+const tchip = t => `<span class="tchip" style="--c:${t.color}">${t.emoji || '🏷'}${esc(t.name)}</span>`;
+const tchips = x => { const ts = tagIds(x).map(tagById); return ts.length ? `<span class="tchips">${ts.map(tchip).join('')}</span>` : ''; };
+function idsFromNames(names) {   // 「#薬」→ タグのID。無い名前は新しく作る
+  if (!names || !names.length) return [];
+  let list = tagDefs().slice(), made = false;
+  const ids = names.map(n => {
+    let t = list.find(t => t.name.toLowerCase() === n.toLowerCase());
+    if (!t) { t = { id: uid(), name: n, emoji: '🏷', color: PAL[list.length % PAL.length], words: '', by: 'what' }; list.push(t); made = true; }
+    return t.id;
+  });
+  if (made) saveTags(list);
+  return ids;
+}
+
 /* ---------- 入力 ---------- */
 const inp = $('inp');
 let override = null, composing = false, compEnd = 0;
@@ -347,13 +465,20 @@ function preview() {
     ? `<button class="chip k-due" id="flip" title="押すと記録に変える">⏳ 期限</button>`
     : `<button class="chip k-log" id="flip" title="押すと期限に変える">📝 記録</button>`;
   const when = r.kind === 'due' ? (r.at ? fmtDate(r.at, r.hasTime) + ' まで' : 'いつまで？（未定）') : fmtDate(r.at, r.hasTime);
-  pv.innerHTML = k + `<span class="chip">${esc(when)}</span><span class="chip">${r.icon || '・'} ${esc(r.title)}</span>` + (r.who ? `<span class="chip who">👤 ${esc(r.who)}</span>` : '') + `<span class="hint">⏎</span>`;
+  pv.innerHTML = k + `<span class="chip">${esc(when)}</span><span class="chip">${r.icon || '・'} ${esc(r.title)}</span>` + (r.who ? `<span class="chip who">👤 ${esc(r.who)}</span>` : '') + previewTags(r) + `<span class="hint">⏎</span>`;
   $('flip').onclick = () => { override = r.kind === 'due' ? 'log' : 'due'; preview(); inp.focus(); };
+}
+function previewTags(r) {
+  const known = (r.tagNames || []).map(n => tagDefs().find(t => t.name.toLowerCase() === n.toLowerCase()));
+  const ts = [...new Set([...autoTags(r), ...known.filter(Boolean).map(t => t.id)])].map(tagById).filter(Boolean);
+  const fresh = (r.tagNames || []).filter((n, i) => !known[i]).map(n => tchip({ name: n + '（新）', emoji: '🏷', color: 'var(--dim)' }));
+  return ts.map(tchip).join('') + fresh.join('');
 }
 function add() {
   const v = inp.value.trim(); if (!v) return;
   const r = readNow(), now = Date.now();
   const it = Object.assign({ id: uid(), c: now, done: false }, r);
+  it.tags = idsFromNames(r.tagNames); delete it.tagNames;
   inp.value = ''; override = null; grow(); preview();
   touch(it);
   showRecent(it);
@@ -362,7 +487,7 @@ function add() {
 }
 function showRecent(it) {
   if (!QUICK) return;
-  const list = Object.values(items).filter(x => !x.del).sort((a, b) => b.c - a.c).slice(0, 3);
+  const list = realItems().sort((a, b) => b.c - a.c).slice(0, 3);
   $('recent').innerHTML = list.map(x => `<div>${x.kind === 'due' ? '⏳' : '📝'} ${esc(x.title)} <span style="color:var(--faint)">— ${x.kind === 'due' ? (x.at ? fmtDate(x.at, x.hasTime) + 'まで' : '期限未定') : fmtDate(x.at, x.hasTime)}</span></div>`).join('');
 }
 
@@ -404,7 +529,8 @@ const spanTxt = d => d >= 60 ? Math.round(d / 30) + 'か月' : d + '日';
 function render() {
   if (QUICK) return;
   const now = Date.now();
-  const all = Object.values(items).filter(x => !x.del);
+  const all = realItems();
+  drawTags(all, now);
   const dues = all.filter(x => x.kind === 'due' && !x.done && x.at != null).sort((a, b) => a.at - b.at);
   const undated = all.filter(x => x.kind === 'due' && !x.done && x.at == null).sort((a, b) => b.c - a.c);
   // 済んだ期限は「やったこと」として過去側に出す
@@ -480,7 +606,7 @@ function drawCal(all, now) {
   let w = '';
   for (let i = 0; i < 7; i++) {
     const day = addDay(wk0, i), d = new Date(day), es = by[day] || [];
-    const chips = es.map(x => `<div class="${ciCls(x, now)}" data-id="${x.id}" title="${esc(x.title)}">${x.hasTime ? '<small>' + new Date(x.at).getHours() + ':' + p2(new Date(x.at).getMinutes()) + '</small>' : ''}${x.icon || (x.kind === 'due' ? '⏳' : '')}${esc(x.title)}<button class="xx" title="消す">×</button></div>`).join('');
+    const chips = es.map(x => `<div class="${ciCls(x, now)}" data-id="${x.id}" title="${esc(x.title)}"${(t0 => t0 ? ` style="box-shadow:inset 3px 0 0 ${t0.color}"` : '')(tagById(tagIds(x)[0]))}>${x.hasTime ? '<small>' + new Date(x.at).getHours() + ':' + p2(new Date(x.at).getMinutes()) + '</small>' : ''}${x.icon || (x.kind === 'due' ? '⏳' : '')}${esc(x.title)}<button class="xx" title="消す">×</button></div>`).join('');
     w += `<div class="wd${day === selDay ? ' sel' : ''}${day === today ? ' today' : ''}" data-day="${day}"><div class="wh"><span class="${wcls(d.getDay())}">${W[d.getDay()]}</span> <b>${d.getDate()}</b></div><div class="wi">${chips}</div></div>`;
   }
   $('wGrid').innerHTML = w;
@@ -491,7 +617,7 @@ function drawCal(all, now) {
   $('dList').innerHTML = es.length ? es.map(x => {
     const t = x.hasTime ? new Date(x.at).getHours() + ':' + p2(new Date(x.at).getMinutes()) : (x.kind === 'due' ? 'この日' : '');
     const r = x.kind === 'due' ? (x.done ? '✓ 済み' : leftTxt(x, now)) : (x.kind === 'log' ? '📝 記録' : '');
-    return `<div class="${ciCls(x, now)}" data-id="${x.id}"><span class="t">${t}</span><span>${x.icon ? x.icon + ' ' : ''}${esc(x.title)}${x.who ? ` <span class="w">👤${esc(x.who)}</span>` : ''}</span><span class="r">${r}</span><button class="xx" title="消す">×</button></div>`;
+    return `<div class="${ciCls(x, now)}" data-id="${x.id}"><span class="t">${t}</span><span>${x.icon ? x.icon + ' ' : ''}${esc(x.title)}${x.who ? ` <span class="w">👤${esc(x.who)}</span>` : ''} ${tchips(x)}</span><span class="r">${r}</span><button class="xx" title="消す">×</button></div>`;
   }).join('') : '<div class="none">この日は何もない</div>';
   document.querySelectorAll('#cal [data-day]').forEach(el => el.onclick = e => { if (e.target.closest('[data-id]')) return; setSel(Number(el.dataset.day)); });
 }
@@ -509,6 +635,7 @@ function dueCard(x, now) {
   if (x.who) meta.push(`<span class="who">👤 ${esc(x.who)}</span>`);
   if (x.rid && x.rid !== '-') meta.push('<span title="Macのリマインダー「期限」に入っている">🔔 リマインダー</span>');
   { const g = agoTxt(x.c, now); meta.push(`<span>${g}${/今日|昨日/.test(g) ? '' : 'に'}書いた</span>`); }
+  { const tc = tchips(x); if (tc) meta.push(tc); }
   return `<div class="${cls}" data-id="${x.id}"><button class="ck" title="済み">✓</button><div class="bd"><div class="tt">${x.icon ? x.icon + ' ' : ''}${esc(x.title)}</div><div class="mt">${meta.join('')}</div>${bar}</div><div class="rt"><div class="big">${big}</div><div class="sm">${sm}</div></div><button class="xx" title="消す">×</button></div>`;
 }
 function logCard(x, now, groups) {
@@ -529,6 +656,7 @@ function logCard(x, now, groups) {
     }
     if (x.who) meta.push(`<span class="who">👤 ${esc(x.who)}</span>`);
   }
+  { const tc = tchips(items[x.id] || x); if (tc) meta.push(tc); }
   return `<div class="card log ${x._done ? 'done' : ''}" data-id="${x.id}"><div class="ic">${x._done ? '✓' : (x.icon || '・')}</div><div class="bd"><div class="tt">${esc(x.title)}</div><div class="mt">${meta.join('')}</div></div><div class="rt"><div class="big">${agoTxt(x.at, now)}</div></div><button class="xx" title="消す">×</button></div>`;
 }
 
@@ -573,8 +701,105 @@ function drawStrip(dues, logs, now) {
   el.innerHTML = s;
 }
 
+/* ---------- タブ（ホーム／🏷 タグ） ---------- */
+let TAB = LS.get('tab', 'home'), selTag = LS.get('selTag', 'kusuri');
+function setTab(t) { TAB = t; LS.set('tab', t); document.body.dataset.tab = t; document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === t)); render(); }
+document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => setTab(b.dataset.tab));
+document.body.dataset.tab = TAB;
+document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === TAB));
+
+/* ---------- 🏷 タグの表 ---------- */
+function drawTags(all, now) {
+  if (TAB !== 'tags') return;
+  const defs = tagDefs();
+  const by = {}; all.forEach(x => tagIds(x).forEach(id => (by[id] = by[id] || []).push(x)));
+  if (!tagById(selTag)) selTag = defs[0] ? defs[0].id : '';
+  $('tgBar').innerHTML = defs.map(t => `<button data-tag="${t.id}" class="${t.id === selTag ? 'on' : ''}" style="--c:${t.color}">${t.emoji || '🏷'} ${esc(t.name)} <span class="c">${(by[t.id] || []).length}</span></button>`).join('')
+    + '<button class="add" id="tgAdd">＋ タグを作る</button>';
+  document.querySelectorAll('#tgBar [data-tag]').forEach(b => b.onclick = () => { selTag = b.dataset.tag; LS.set('selTag', selTag); render(); });
+  $('tgAdd').onclick = () => openTagSheet(null);
+  const t = tagById(selTag);
+  if (!t) { $('tgBody').innerHTML = '<div class="empty">タグがありません。「＋ タグを作る」から作れます</div>'; return; }
+  const list = (by[t.id] || []).slice().sort((a, b) => (b.at || b.c) - (a.at || a.c));
+  const ws = wordsOf(t);
+  let h = `<div class="tghead"><h3>${t.emoji || '🏷'} ${esc(t.name)}</h3><span class="hint">${list.length}件</span><span class="sp" style="flex:1"></span><button class="ed" id="tgEdit">✎ このタグを直す</button></div>`;
+  h += `<div class="tgwords">${ws.length ? '自動で付く言葉：' + ws.map(esc).join('、') : '自動では付かない'}　／　書くときに <b>#${esc(t.name)}</b> と入れても付く</div>`;
+  if (!list.length) { $('tgBody').innerHTML = h + `<div class="empty">まだ何も付いていない</div>`; $('tgEdit').onclick = () => openTagSheet(t.id); return; }
+
+  // まとめ（なにごと／人ごと）：回数・最後・平均の間隔・次はだいたい
+  const gk = x => t.by === 'who' ? (x.who || PottoParse.parse(x.raw || x.title).who || PottoParse.groupKey(x.title)) : PottoParse.groupKey(x.title);   // 前に書いた分は「だれ」が空なので読み直す
+  const groups = {};
+  list.forEach(x => { const k = gk(x) || '（その他）'; (groups[k] = groups[k] || []).push(x); });
+  const gcards = Object.entries(groups).sort((a, b) => (b[1][0].at || 0) - (a[1][0].at || 0)).map(([k, xs]) => {
+    const ds = xs.filter(x => x.at != null).map(x => x.at).sort((a, b) => a - b);
+    const lines = [`${xs.length}回`];
+    if (ds.length) lines.push(`最後 ${fmtDate(ds[ds.length - 1])}（${agoTxt(ds[ds.length - 1], now)}）`);
+    if (ds.length >= 2) {
+      const avg = Math.round(calDays(ds[0], ds[ds.length - 1]) / (ds.length - 1));
+      if (avg > 0) {
+        lines.push(`だいたい${spanTxt(avg)}ごと`);
+        const next = ds[ds.length - 1] + avg * DAY;
+        lines.push(`<span class="nx">次は ${fmtDate(next)} ごろ${next < now ? '（もう過ぎてる）' : ''}</span>`);
+      }
+    }
+    return `<div class="gs" style="--c:${t.color}"><b>${t.by === 'who' ? '👤 ' : ''}${esc(k)}</b><div class="gl">${lines.join('<br>')}</div></div>`;
+  });
+  h += `<div class="tgsum">${gcards.join('')}</div>`;
+
+  // 表
+  h += '<div class="tgtab"><div class="tr th"><span>日付</span><span></span><span>なに</span><span class="w">だれ</span><span class="ot">ほかのタグ</span><span></span></div>';
+  h += list.map(x => {
+    const others = tagIds(x).filter(id => id !== t.id).map(tagById).map(tchip).join(' ');
+    const d = x.at != null ? fmtDate(x.at, x.hasTime) : '期限未定';
+    const sub = x.kind === 'due' ? (x.done ? '✓ 済み' : x.at != null ? leftTxt(x, now) : '') : agoTxt(x.at, now);
+    return `<div class="tr${x.done ? ' done' : ''}" data-id="${x.id}"><span class="d">${d}</span><span>${x.kind === 'due' ? '⏳' : '📝'}</span><span class="tt2">${esc(x.title)}<small>${sub}</small></span><span class="w">${x.who ? '👤' + esc(x.who) : ''}</span><span class="ot">${others}</span><button class="xx" title="消す">×</button></div>`;
+  }).join('') + '</div>';
+  $('tgBody').innerHTML = h;
+  $('tgEdit').onclick = () => openTagSheet(t.id);
+}
+
+/* ---------- タグを作る・直す ---------- */
+let tEditId = null, tColor = PAL[0], tByV = 'what', tAfter = null;
+function openTagSheet(id, after) {
+  const t = id ? tagById(id) : null;
+  tEditId = id; tAfter = after || null;
+  $('tName').value = t ? t.name : ''; $('tEmoji').value = t ? (t.emoji || '') : '🏷';
+  $('tWords').value = t ? (t.words || '') : '';
+  tColor = t ? t.color : PAL[tagDefs().length % PAL.length]; tByV = t ? (t.by || 'what') : 'what';
+  $('tDel').style.display = t ? '' : 'none';
+  drawPal(); drawBy();
+  $('tSheet').classList.add('on'); $('tSheetBg').classList.add('on');
+  setTimeout(() => $('tName').focus(), 50);
+}
+function drawPal() { $('tPal').innerHTML = PAL.map(c => `<button style="background:${c}" class="${c === tColor ? 'on' : ''}" data-c="${c}"></button>`).join(''); document.querySelectorAll('#tPal button').forEach(b => b.onclick = () => { tColor = b.dataset.c; drawPal(); }); }
+function drawBy() { document.querySelectorAll('#tBy button').forEach(b => { b.classList.toggle('on', b.dataset.by === tByV); b.onclick = () => { tByV = b.dataset.by; drawBy(); }; }); }
+function closeTagSheet() { $('tSheet').classList.remove('on'); $('tSheetBg').classList.remove('on'); tEditId = null; tAfter = null; }
+$('tClose').onclick = closeTagSheet;
+$('tSheetBg').onclick = closeTagSheet;
+$('tSave').onclick = () => {
+  const name = $('tName').value.trim().replace(/^[#＃]/, ''); if (!name) { $('tName').focus(); return; }
+  const list = tagDefs().map(t => Object.assign({}, t));
+  const v = { name, emoji: $('tEmoji').value.trim() || '🏷', color: tColor, words: $('tWords').value.trim(), by: tByV };
+  let id = tEditId;
+  if (id) Object.assign(list.find(t => t.id === id), v);
+  else { id = uid(); list.push(Object.assign({ id }, v)); }
+  const after = tAfter;
+  saveTags(list); closeTagSheet();
+  if (after) after(id); else { selTag = id; LS.set('selTag', id); render(); }
+};
+$('tDel').onclick = () => {
+  const id = tEditId, before = tagDefs().slice(), t = tagById(id);
+  saveTags(before.filter(x => x.id !== id)); closeTagSheet();
+  toast('タグを消した：' + t.name + '（書いたものは消えない）', () => saveTags(before));
+};
+
 /* ---------- 直す ---------- */
-let editId = null, editSnap = null;
+let editId = null, editSnap = null, eTagSel = new Set();
+function drawETags() {
+  $('eTags').innerHTML = tagDefs().map(t => `<button data-t="${t.id}" class="${eTagSel.has(t.id) ? 'on' : ''}" style="--c:${t.color}">${t.emoji || '🏷'} ${esc(t.name)}</button>`).join('') + '<button class="add" id="eTagAdd">＋ 新しいタグ</button>';
+  document.querySelectorAll('#eTags [data-t]').forEach(b => b.onclick = () => { const id = b.dataset.t; eTagSel.has(id) ? eTagSel.delete(id) : eTagSel.add(id); drawETags(); });
+  $('eTagAdd').onclick = () => openTagSheet(null, id => { eTagSel.add(id); drawETags(); });
+}
 function openSheet(id) {
   const x = items[id]; if (!x) return;
   editId = id; editSnap = JSON.stringify(x);
@@ -582,6 +807,7 @@ function openSheet(id) {
   if (x.at != null) { const d = new Date(x.at); $('eDate').value = `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}`; $('eTime').value = x.hasTime ? `${p2(d.getHours())}:${p2(d.getMinutes())}` : ''; }
   else { $('eDate').value = ''; $('eTime').value = ''; }
   segK(x.kind);
+  eTagSel = new Set(tagIds(x)); drawETags();
   $('eDone').textContent = x.done ? '済みを取り消す' : '✓ 済みにする';
   $('eDone').style.display = x.kind === 'due' ? '' : 'none';
   $('sheet').classList.add('on'); $('sheetBg').classList.add('on');
@@ -593,6 +819,8 @@ function readSheet() {
   x.kind = document.querySelector('#kSeg button.on').dataset.k;
   x.title = $('eTitle').value.trim() || x.title; x.who = $('eWho').value.trim();
   x.icon = PottoParse.iconFor(x.title + ' ' + (x.raw || '')) || x.icon;
+  const auto = autoTags(x);
+  x.tags = [...eTagSel]; x.notags = auto.filter(id => !eTagSel.has(id));
   const dv = $('eDate').value, tv = $('eTime').value;
   if (dv) {
     const [y, m, d] = dv.split('-').map(Number), dt = new Date(y, m - 1, d);
@@ -605,7 +833,7 @@ function readSheet() {
 function closeSheet(save) {
   if (save && editId && items[editId]) {
     const x = readSheet(), before = JSON.parse(editSnap);
-    const same = ['kind', 'title', 'who', 'at', 'hasTime', 'icon'].every(k => before[k] === x[k]);
+    const same = ['kind', 'title', 'who', 'at', 'hasTime', 'icon'].every(k => before[k] === x[k]) && tagIds(before).sort().join() === tagIds(x).sort().join();
     if (!same) touch(x);
   }
   editId = null; $('sheet').classList.remove('on'); $('sheetBg').classList.remove('on');
