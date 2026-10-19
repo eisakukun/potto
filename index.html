@@ -19,7 +19,7 @@
 html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku Gothic ProN",sans-serif;-webkit-text-size-adjust:100%}
 body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
-.wrap{max-width:1100px;margin:0 auto;padding:10px 16px 40px}
+.wrap{max-width:1400px;margin:0 auto;padding:10px 16px 40px}
 
 /* 入力 */
 .top{position:sticky;top:0;z-index:5;background:var(--bg);padding:8px 0 10px;margin:0 -16px;padding-left:16px;padding-right:16px;border-bottom:1px solid var(--line)}
@@ -35,6 +35,66 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
 .chip.k-due{background:rgba(255,179,71,.16);color:var(--due)} .chip.k-log{background:rgba(108,198,255,.14);color:var(--log)}
 button.chip{border:1px dashed transparent} button.chip:hover{border-color:var(--faint)}
 .hint{color:var(--faint);font-size:12px}
+
+/* カレンダー：月・週・日を同時に。どれかで日を選ぶと3つとも合わせて動く */
+.cal{display:grid;grid-template-columns:1.15fr 1.75fr 1fr;gap:10px;margin-top:14px}
+.cp{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px;min-width:0}
+.ch{display:flex;align-items:center;gap:6px;margin-bottom:8px;font-size:13px;font-weight:600}
+.ch .tg{font-size:10px;letter-spacing:.1em;color:var(--dim);font-weight:600;background:var(--panel2);border-radius:6px;padding:2px 6px}
+.ch .lbl{flex:1;text-align:center;white-space:nowrap}
+.ch .nv{width:26px;height:26px;border-radius:8px;background:var(--panel2);flex:none;font-size:13px}
+.ch .nv:hover{background:var(--line)}
+.ch .td{font-size:11px;padding:4px 8px;border-radius:8px;background:var(--panel2);flex:none}
+.mg{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px}
+.mw{font-size:10px;color:var(--dim);text-align:center;padding-bottom:2px}
+.sat{color:#6ea8ff} .sun{color:#ff7a7a}
+.mc{min-height:62px;border-radius:6px;padding:2px 3px;cursor:pointer;background:var(--bg);min-width:0}
+.mc:hover{background:var(--panel2)}
+.mc.out{opacity:.35}
+.mc.inweek{background:var(--panel2)}
+.mc.sel{outline:2px solid var(--accent);outline-offset:-2px}
+.mc .n{font-size:11px;display:inline-block;min-width:16px;text-align:center}
+.mc.today .n{background:var(--accent);color:#111;border-radius:999px;font-weight:700}
+.mi{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4}
+.mi.due{color:var(--due)} .mi.log{color:var(--log)} .mi.done{text-decoration:line-through;opacity:.55} .mi.more{color:var(--faint)}
+.mdots{display:none}
+.wg{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.wd{background:var(--bg);border-radius:8px;padding:4px;min-height:170px;cursor:pointer;min-width:0}
+.wd:hover{background:#171a20}
+.wd.sel{outline:2px solid var(--accent);outline-offset:-2px}
+.wd .wh{font-size:11px;color:var(--dim);text-align:center;margin-bottom:5px;white-space:nowrap}
+.wd.today .wh b{background:var(--accent);color:#111;border-radius:999px;padding:0 5px}
+.ci{font-size:11px;border-radius:5px;padding:2px 5px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.ci.due{background:rgba(255,179,71,.16);color:var(--due)} .ci.log{background:rgba(108,198,255,.14);color:var(--log)}
+.ci.done{text-decoration:line-through;opacity:.55}
+.ci.over{background:rgba(255,107,94,.18);color:var(--due2)}
+.wd .ci{white-space:normal;word-break:break-all;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;line-height:1.3;padding:3px 4px}
+.wd .ci small{display:block;font-size:9.5px;opacity:.85}
+@media (min-width:761px) and (max-width:1180px){
+  .cal{grid-template-columns:1.1fr 1fr;grid-template-areas:"m d" "w w"}
+  .cp.cm{grid-area:m} .cp.cd{grid-area:d} .cp.cw{grid-area:w}
+}
+.dl .ci{font-size:13.5px;white-space:normal;padding:7px 9px;margin-bottom:6px;display:flex;gap:8px;align-items:baseline;color:var(--ink)}
+.dl .ci .t{flex:none;font-variant-numeric:tabular-nums;min-width:42px;font-size:12px}
+.dl .ci.due .t,.dl .ci.due .r{color:var(--due)} .dl .ci.log .t,.dl .ci.log .r{color:var(--log)} .dl .ci.over .t,.dl .ci.over .r{color:var(--due2)}
+.dl .ci .r{margin-left:auto;flex:none;font-weight:700;font-size:12px}
+.dl .ci .w{color:var(--accent);font-size:11.5px}
+.dl .none{color:var(--faint);font-size:12.5px;padding:18px 6px;text-align:center}
+@media (max-width:760px){
+  .cal{grid-template-columns:1fr}
+  .cp.cd{order:1} .cp.cw{order:2} .cp.cm{order:3}
+  .wg{grid-template-columns:1fr;gap:3px}
+  .wd{min-height:0;display:flex;gap:8px;align-items:flex-start;padding:6px}
+  .wd .wh{width:52px;text-align:left;flex:none;margin:1px 0 0}
+  .wd .wi{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:3px}
+  .wd .ci{margin:0;max-width:100%}
+  .wd .ci small{display:inline;margin-right:3px}
+  .wd .wi:empty::after{content:'—';color:var(--faint);font-size:11px}
+  .mc{min-height:42px}
+  .mi{display:none}
+  .mdots{display:flex;gap:2px;flex-wrap:wrap;margin-top:2px;padding-left:2px}
+  .mdots i{width:5px;height:5px;border-radius:50%;display:block}
+}
 
 /* 帯（今日を真ん中にした線） */
 .strip{margin:14px 0 6px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:6px 4px;overflow:hidden}
@@ -105,7 +165,7 @@ button.chip{border:1px dashed transparent} button.chip:hover{border-color:var(--
 .keybox{background:rgba(255,209,102,.1);border:1px solid rgba(255,209,102,.35);color:var(--accent);border-radius:10px;padding:8px 12px;font-size:13px;margin-top:8px}
 
 /* Macの⌥⌘K 入力窓（?quick=1）：入力と読み取りだけ */
-body.quick .strip,body.quick .board,body.quick .foot{display:none}
+body.quick .strip,body.quick .board,body.quick .cal,body.quick .foot{display:none}
 body.quick .top{position:static;border:0}
 body.quick #inp{font-size:18px}
 .qonly{display:none} body.quick .qonly{display:inline-flex}
@@ -127,6 +187,12 @@ body.quick .recent{display:block}
     <div class="pv" id="pv"><span class="hint">「〜までに」「来週金曜」→ 期限／「〜した」「〜入った」→ 記録</span></div>
     <div id="keyNote"></div>
     <div class="recent" id="recent"></div>
+  </div>
+
+  <div class="cal" id="cal">
+    <div class="cp cm"><div class="ch"><span class="tg">月</span><button class="nv" data-nav="m-1">‹</button><span class="lbl" id="mLbl"></span><button class="nv" data-nav="m1">›</button></div><div class="mg" id="mGrid"></div></div>
+    <div class="cp cw"><div class="ch"><span class="tg">週</span><button class="nv" data-nav="w-1">‹</button><span class="lbl" id="wLbl"></span><button class="nv" data-nav="w1">›</button></div><div class="wg" id="wGrid"></div></div>
+    <div class="cp cd"><div class="ch"><span class="tg">日</span><button class="nv" data-nav="d-1">‹</button><span class="lbl" id="dLbl"></span><button class="nv" data-nav="d1">›</button><button class="td" data-nav="today">今日</button></div><div class="dl" id="dList"></div></div>
   </div>
 
   <div class="strip" id="strip"></div>
@@ -169,7 +235,7 @@ body.quick .recent{display:block}
 
 <script src="parse.js"></script>
 <script>
-const APP_VERSION = '2026-10-16-3';
+const APP_VERSION = '2026-10-19-1';
 const GAS = 'https://script.google.com/macros/s/AKfycbyX-ywN70IMoxiLOF3VyRgje4y85_ilLzhyWfqszCvaEevBNjxtX62tboVMyGvht9VGbw/exec';
 const Q = new URLSearchParams(location.search);
 const QUICK = Q.get('quick') === '1';
@@ -350,10 +416,74 @@ function render() {
     + (logs.length > LIM ? `<button class="more" id="moreBtn">ほか ${logs.length - LIM} 件を見る</button>` : '');
   if ($('moreBtn')) $('moreBtn').onclick = () => { showAll = true; render(); };
   drawStrip(dues, logs, now);
+  drawCal(all, now);
   document.querySelectorAll('[data-id]').forEach(el => el.onclick = e => {
     if (e.target.closest('.ck')) { e.stopPropagation(); markDone(el.dataset.id); return; }
     openSheet(el.dataset.id);
   });
+}
+/* ---------- カレンダー（月・週・日を同時に） ---------- */
+let selDay = d0(Date.now()), monCur = null;   // monCur＝月の欄で見ている月の1日
+const monFirst = ms => { const d = new Date(ms); return new Date(d.getFullYear(), d.getMonth(), 1).getTime(); };
+const addDay = (ms, n) => { const d = new Date(ms); d.setDate(d.getDate() + n); return d0(d.getTime()); };
+const monday = ms => addDay(ms, -((new Date(ms).getDay() + 6) % 7));
+const wcls = dw => dw === 6 ? 'sat' : dw === 0 ? 'sun' : '';
+function setSel(ms) { selDay = d0(ms); monCur = monFirst(selDay); render(); }
+document.querySelectorAll('[data-nav]').forEach(b => b.onclick = () => {
+  const v = b.dataset.nav;
+  if (v === 'today') return setSel(Date.now());
+  const n = Number(v.slice(1));
+  if (v[0] === 'm') { const d = new Date(monCur); monCur = new Date(d.getFullYear(), d.getMonth() + n, 1).getTime(); render(); }
+  if (v[0] === 'w') setSel(addDay(selDay, 7 * n));
+  if (v[0] === 'd') setSel(addDay(selDay, n));
+});
+function calEntries(all) {   // 日ごとの中身（期限は締めの日、記録はやった日）
+  const by = {};
+  all.forEach(x => {
+    if (x.at == null) return;
+    (by[d0(x.at)] = by[d0(x.at)] || []).push(x);
+  });
+  Object.values(by).forEach(a => a.sort((p, q) => (p.kind === q.kind ? 0 : p.kind === 'due' ? -1 : 1) || p.at - q.at));
+  return by;
+}
+function ciCls(x, now) { return 'ci ' + x.kind + (x.done ? ' done' : '') + (x.kind === 'due' && !x.done && x.at < now ? ' over' : ''); }
+function drawCal(all, now) {
+  if (!monCur) monCur = monFirst(selDay);
+  const by = calEntries(all), today = d0(now), wk0 = monday(selDay);
+  // 月
+  const mf = new Date(monCur);
+  $('mLbl').textContent = `${mf.getFullYear()}年${mf.getMonth() + 1}月`;
+  const start = monday(monCur), last = new Date(mf.getFullYear(), mf.getMonth() + 1, 0).getTime();
+  const weeks = Math.ceil((Math.round((d0(last) - start) / DAY) + 1) / 7);
+  let m = '月火水木金土日'.split('').map((w, i) => `<div class="mw ${wcls((i + 1) % 7)}">${w}</div>`).join('');
+  for (let i = 0; i < weeks * 7; i++) {
+    const day = addDay(start, i), d = new Date(day), es = by[day] || [];
+    const cls = ['mc', d.getMonth() !== mf.getMonth() ? 'out' : '', day === today ? 'today' : '', day === selDay ? 'sel' : '', day >= wk0 && day < addDay(wk0, 7) ? 'inweek' : ''].join(' ');
+    const lines = es.slice(0, 3).map(x => `<div class="mi ${x.kind}${x.done ? ' done' : ''}">${x.icon || (x.kind === 'due' ? '⏳' : '・')}${esc(x.title)}</div>`).join('') + (es.length > 3 ? `<div class="mi more">+${es.length - 3}</div>` : '');
+    const dots = es.slice(0, 6).map(x => `<i style="background:var(--${x.kind === 'due' ? 'due' : 'log'})"></i>`).join('');
+    m += `<div class="${cls}" data-day="${day}"><span class="n ${wcls(d.getDay())}">${d.getDate()}</span>${lines}<div class="mdots">${dots}</div></div>`;
+  }
+  $('mGrid').innerHTML = m;
+  // 週
+  const we = addDay(wk0, 6), a = new Date(wk0), b = new Date(we);
+  $('wLbl').textContent = `${a.getMonth() + 1}/${a.getDate()} 〜 ${b.getMonth() + 1}/${b.getDate()}`;
+  let w = '';
+  for (let i = 0; i < 7; i++) {
+    const day = addDay(wk0, i), d = new Date(day), es = by[day] || [];
+    const chips = es.map(x => `<div class="${ciCls(x, now)}" data-id="${x.id}" title="${esc(x.title)}">${x.hasTime ? '<small>' + new Date(x.at).getHours() + ':' + p2(new Date(x.at).getMinutes()) + '</small>' : ''}${x.icon || (x.kind === 'due' ? '⏳' : '')}${esc(x.title)}</div>`).join('');
+    w += `<div class="wd${day === selDay ? ' sel' : ''}${day === today ? ' today' : ''}" data-day="${day}"><div class="wh"><span class="${wcls(d.getDay())}">${W[d.getDay()]}</span> <b>${d.getDate()}</b></div><div class="wi">${chips}</div></div>`;
+  }
+  $('wGrid').innerHTML = w;
+  // 日
+  const sd = new Date(selDay), rel = Math.round((selDay - today) / DAY);
+  $('dLbl').textContent = `${sd.getMonth() + 1}/${sd.getDate()}(${W[sd.getDay()]})` + (rel === 0 ? ' 今日' : rel === 1 ? ' 明日' : rel === -1 ? ' 昨日' : rel > 0 ? ` ${rel}日後` : ` ${-rel}日前`);
+  const es = by[selDay] || [];
+  $('dList').innerHTML = es.length ? es.map(x => {
+    const t = x.hasTime ? new Date(x.at).getHours() + ':' + p2(new Date(x.at).getMinutes()) : (x.kind === 'due' ? 'この日' : '');
+    const r = x.kind === 'due' ? (x.done ? '✓ 済み' : leftTxt(x, now)) : (x.kind === 'log' ? '📝 記録' : '');
+    return `<div class="${ciCls(x, now)}" data-id="${x.id}"><span class="t">${t}</span><span>${x.icon ? x.icon + ' ' : ''}${esc(x.title)}${x.who ? ` <span class="w">👤${esc(x.who)}</span>` : ''}</span><span class="r">${r}</span></div>`;
+  }).join('') : '<div class="none">この日は何もない</div>';
+  document.querySelectorAll('#cal [data-day]').forEach(el => el.onclick = e => { if (e.target.closest('[data-id]')) return; setSel(Number(el.dataset.day)); });
 }
 let showAll = false;
 function dueCard(x, now) {
@@ -395,7 +525,7 @@ function logCard(x, now, groups) {
 /* 帯：今日を真ん中に、左＝過去の記録、右＝未来の期限。近いほど広く（平方根の目盛り） */
 function drawStrip(dues, logs, now) {
   const el = $('strip');
-  const narrow = innerWidth < 760;
+  const narrow = (el.clientWidth || document.documentElement.clientWidth || 1024) < 700;
   const Wd = narrow ? 360 : 1060, H = narrow ? 176 : 160, cx = Wd / 2, half = Wd / 2 - 14, axis = narrow ? 100 : H / 2 + 6;
   const far = Math.max(30, ...dues.map(x => calDays(now, x.at)).filter(d => d > 0).map(d => Math.min(d, 365)), ...logs.slice(0, 30).map(x => Math.min(365, calDays(x.at, now))));
   const R = Math.min(365, Math.ceil(far / 30) * 30 || 30);
